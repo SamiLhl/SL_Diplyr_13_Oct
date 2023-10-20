@@ -1,0 +1,145 @@
+---
+title: "Friday_Lab1310"
+author: "Sami Louahlia"
+format: html
+execute:
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r configuration}
+library(here)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+here :: i_am ("SL_Diplyr_13_Oct.Rproj")
+theme_set(theme_bw())
+spotify <- readRDS("top-spotify-hits-2000-2019.Rds")
+dropout <- readRDS("dropout.Rds")
+```
+
+## Exercise 1
+
+### Q1
+
+```{r}
+bspotify <- spotify 
+  
+```
+```{r}
+ 
+bspotify = spotify %>% distinct(artist, song, .keep_all = TRUE)
+Q1 <- bspotify
+
+table1 <- knitr::kable(Q1)
+```
+The new data set contains `r nrow(bspotify)` songs, which is less than the previous data set with its `r nrow(spotify)` songs. Using the distinct function reduces the number of observations, implying there was redundance in the original data (nth times the same song of the same artist).`
+
+### Q2
+```{r}
+  Q2 <- spotify %>% distinct(artist, year, .keep_all = TRUE) |>
+  group_by(year)|>
+  summarise (n())
+
+table2 <- knitr::kable(Q2)
+```
+`r table2`
+This table shows how many artists appear every year in the data. One artist's appearance is only counted once every year.
+
+### Q3
+```{r}
+Q3 <- bspotify  |> 
+  group_by(artist) |>
+  summarise(num_song =n())|>
+  arrange(desc(num_song))|>
+  slice_head(n=1)
+artist_name <- Q3 |> pull(artist )
+number_song <- Q3 |> pull(num_song)
+
+table3 <- knitr::kable(Q3)
+```
+`r table3` The most popular artist is Rihanna.
+
+### Q4 
+```{r}
+Q4 <- bspotify |> summarise(min(tempo), max(tempo), mean(tempo), median(tempo))
+
+table4 <- knitr::kable(Q4)
+```
+
+`r table4` This table summarizes the mininum, maximum, mean and median of the variable tempo. This represent a good amount of descriptives. Which may then help as to how to deal with the variable.
+
+### Q5 
+```{r}
+Q5 <- bspotify |> group_by(year) |> summarise(mean(liveness), mean(danceability))
+
+table5 <- knitr::kable(Q5)
+```
+`r table4` This table summarize the mean liveness and danceability of songs on a yearly basis. It gives a numerical representation to the graph that follows in the next question.
+
+### Q6
+```{r means_Liveness_Danceability}
+Q6 <- Q5 |>
+  pivot_longer(-year, names_to= "group", values_to = "value")
+ggplot(Q6, aes(x=year,y=value, color =group))+
+  geom_line()+ 
+  theme(legend.position = "bottom")
+```
+
+This graph shows both the mean danceability and liveness of songs in the data set, on a yearly basis. This visualization is not very effective in showing any form of correlation between the two variables. Perhaps, reducing the visual distance between the two lines or using another type of graph could help in doing that. 
+
+## Exercise 2 
+### Q1
+```{r}
+Q21 <- dropout |> 
+  group_by(Target, `Marital status`)|>
+  summarise(MedA=median(`Admission grade`))|>
+  pivot_wider(values_from= MedA, names_from = `Marital status`)
+
+table21 <- knitr::kable(Q21)
+```
+`r table21` Without the pivoting it was looking quite ugly. Now it is much more readable. We can make within-groups and between-groups comparison on the median admission grade, accounting both for the Target var and the Marital status var.
+
+### Q2 
+```{r}
+Q22 <- dropout |> 
+  group_by(Target, `Marital status`)|>
+  summarise(MedA=median(`Admission grade`))|>
+  pivot_wider(values_from= MedA, names_from = Target)
+
+table22 <- knitr::kable(Q22)
+```
+`r table22` Funnily, I basically did the thing in a reverse fashion on the first question. As we can see here, we enjoy the same properties as with the previous form. It is a bit easier to read though I would argue. 
+
+### Q3
+```{r}
+Q23 <- dropout |> 
+  group_by(Gender)|>
+  summarise("Curriculars units 1st credited"=median(`Curricular units 1st sem (credited)`),"Curriculars units 1st enrolled"=median(`Curricular units 1st sem (enrolled)`),"Curriculars units 1st evaluations"=median(`Curricular units 1st sem (evaluations)`), "Curriculars units 1st approved"=median(`Curricular units 1st sem (approved)`),"Curriculars units 1st grade"=median(`Curricular units 1st sem (grade)`),"Curriculars units 1st without evaluations"=median(`Curricular units 1st sem (without evaluations)`), "Curriculars units 2nd credited"=median(`Curricular units 2nd sem (credited)`),"Curriculars units 2nd enrolled"=median(`Curricular units 2nd sem (enrolled)`),"Curriculars units 2nd evaluations"=median(`Curricular units 2nd sem (evaluations)`), "Curriculars units 2nd approved"=median(`Curricular units 2nd sem (approved)`), "Curriculars units 2nd grade"=median(`Curricular units 2nd sem (grade)`),"Curriculars units 2nd without evaluations"=median(`Curricular units 2nd sem (without evaluations)`))
+table23 <- knitr::kable(Q23)
+```
+`r table23` This table shows the median of the different curricular units variable of the data set, conditional on gender.
+
+### Q4
+```{r}
+step1 <- dropout |> 
+  select(starts_with("Curricular units"), Gender) |>
+  pivot_longer(cols = starts_with("Curricular units"), names_to = "Units", values_to="Value")
+  
+final_table <- step1|> 
+  group_by(Units, Gender)|>
+  summarise(Median_Value =median(Value, na.rm=TRUE), .groups = 'drop') |> 
+pivot_wider(names_from = Gender,
+            values_from = Median_Value)
+
+table24 <- knitr::kable(final_table)
+  
+```
+`r table24`
+The final table offers a better view on how the median units conditional on gender. Allowing for better between groups (Male/Female) comparisons.
+
+
+
+
+
