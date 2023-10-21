@@ -91,6 +91,15 @@ This graph shows both the mean danceability and liveness of songs in the data se
 
 ## Exercise 2 
 ### Q1
+
+```{r}
+Q211 <- dropout |> 
+  group_by(Target, `Marital status`)|>
+  summarise(MedA=median(`Admission grade`))
+
+table211 <- knitr::kable(Q211)
+```
+`r table211`
 ```{r}
 Q21 <- dropout |> 
   group_by(Target, `Marital status`)|>
@@ -138,8 +147,3 @@ table24 <- knitr::kable(final_table)
 ```
 `r table24`
 The final table offers a better view on how the median units conditional on gender. Allowing for better between groups (Male/Female) comparisons.
-
-
-
-
-
