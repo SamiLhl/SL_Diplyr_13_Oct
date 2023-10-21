@@ -76,7 +76,8 @@ Q5 <- bspotify |> group_by(year) |> summarise(mean(liveness), mean(danceability)
 
 table5 <- knitr::kable(Q5)
 ```
-`r table4` This table summarize the mean liveness and danceability of songs on a yearly basis. It gives a numerical representation to the graph that follows in the next question.
+
+`r table5` This table summarize the mean liveness and danceability of songs on a yearly basis. It gives a numerical representation to the graph that follows in the next question.
 
 ### Q6
 ```{r means_Liveness_Danceability}
