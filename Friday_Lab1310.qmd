@@ -31,10 +31,12 @@ bspotify <- spotify
  
 bspotify = spotify %>% distinct(artist, song, .keep_all = TRUE)
 Q1 <- bspotify
+artist_number <- spotify |> distinct(artist) |> nrow ()
+genre_number <- spotify |> distinct(genre) |> nrow ()
 
 table1 <- knitr::kable(Q1)
 ```
-The new data set contains `r nrow(bspotify)` songs, which is less than the previous data set with its `r nrow(spotify)` songs. Using the distinct function reduces the number of observations, implying there was redundance in the original data (nth times the same song of the same artist).`
+The new data set contains `r nrow(bspotify)` songs, which is less than the previous data set with its `r nrow(spotify)` songs. Moreover, there are `r artist_number` artists and `r genre_number` different genres present in this data set. Using the distinct function reduces the number of observations, implying there was redundance in the original data (nth times the same song of the same artist).`
 
 ### Q2
 ```{r}
